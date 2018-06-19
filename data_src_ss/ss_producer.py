@@ -19,38 +19,31 @@ import io
 import os
 import sys
 import time
-import logging
 import avro.schema
 import avro.io
 from kafka import KafkaProducer
 
-if (len(sys.argv[1:]) != 2):
-        print 'Usage: src.py kafka_broker num_to_send'
-        sys.exit(1)
 
-logging.basicConfig(format='%(asctime)s.%(msecs)s:%(name)s:%(thread)d:%(levelname)s:%(process)d:%(message)s', level=logging.DEBUG)
-kafka = map(str, sys.argv[1].split(','))
-producer = KafkaProducer(bootstrap_servers=kafka)
+def produce(kafka_host, kafka_port, topic, event_count):
+    kafka = "%s:%s" % (kafka_host, kafka_port)
+    producer = KafkaProducer(bootstrap_servers=kafka)
 
-# Avro schema
-here = os.path.abspath(os.path.dirname(__file__))
-schema_path = here + "/dataplatform-raw.avsc"
+    # Avro schema
+    here = os.path.abspath(os.path.dirname(__file__))
+    schema_path = here + "/dataplatform-raw.avsc"
+    schema = avro.schema.parse(open(schema_path).read())
 
-# Kafka topic
-topic = "avro.events.samples"
-schema = avro.schema.parse(open(schema_path).read())
+    current_milli_time = lambda: int(round(time.time() * 1000))
 
-current_milli_time = lambda: int(round(time.time() * 1000))
+    seq = 0
 
-seq = 0
-
-while seq < int(sys.argv[2]):
+    while seq < event_count:
         writer = avro.io.DatumWriter(schema)
         bytes_writer = io.BytesIO()
-        encoder = avro.io.BinaryEncoder(bytes_writer)      
+        encoder = avro.io.BinaryEncoder(bytes_writer)
         writer.write({"src": "test-src", "timestamp": current_milli_time(), "host_ip": "0.0.0.0", "rawdata": "a=1;b=2;c=%s;gen_ts=%s"%(seq,current_milli_time())}, encoder)
         raw_bytes = bytes_writer.getvalue()
         producer.send(topic, raw_bytes)
         seq += 1
 
-producer.close()
+    producer.close()
