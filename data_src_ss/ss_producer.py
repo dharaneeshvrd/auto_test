@@ -47,3 +47,4 @@ def produce(kafka_host, kafka_port, topic, event_count):
         seq += 1
 
     producer.close()
+    return seq
