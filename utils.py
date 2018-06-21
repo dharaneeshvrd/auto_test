@@ -1,7 +1,16 @@
 import spur
+import traceback
 import commands
 
+# constants
+LOGGER = None
+
+def set_logger(logger):
+    global LOGGER
+    LOGGER = logger
+
 def exec_ssh(host, user, key, ssh_commands):
+    command_exe_status = True
     shell = spur.SshShell(
         hostname=host,
         username=user,
@@ -9,14 +18,13 @@ def exec_ssh(host, user, key, ssh_commands):
         missing_host_key=spur.ssh.MissingHostKey.accept)
     with shell:
         for ssh_command in ssh_commands:
-            logging.debug('Host - %s: Command - %s', host, ssh_command)
+            LOGGER.info('Host - %s: Command - %s', host, ssh_command)
             try:
                 shell.run(["bash", "-c", ssh_command])
             except spur.results.RunProcessError as exception:
-                logging.error(
-                    ssh_command +
-                    " - error: " +
-                    traceback.format_exc(exception))
+                LOGGER.error(ssh_command +" - error: " + traceback.format_exc(exception))
+                command_exe_status = False
+    return command_exe_status
 
 def exe_cli(cli_commands):
     command_exe_status = True

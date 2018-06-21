@@ -7,7 +7,7 @@ class PACKAGE_LINK(object):
     TEST2 = "https://s3.amazonaws.com/pnda-apps-public/spark-streaming-example-app-python-1.1.1.tar.gz"
 
 class TOPIC_NAMES(object):
-    TEST1 = "avro.pnda.test-topic1"
+    TEST1 = "avro.pnda.test21"
     TEST2 = "test-topic2"
 
 class AVRO_EVENT_COUNT(object):
