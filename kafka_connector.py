@@ -1,5 +1,6 @@
 import requests
 
+from data_src_sb import sb_producer
 from data_src_ss import ss_producer
 from constant_info import PACKAGE_LIST, TOPIC_NAMES, AVRO_EVENT_COUNT
 
@@ -8,11 +9,9 @@ LOGGER = None
 
 class Kafka_Connection(object):
 
-    def __init__(self, kafka_host, km_bind_port, kafka_port, cluster, logger):
-        self.kafka_host = kafka_host
-        self.kafka_port = kafka_port
-        self.km_bind_port = km_bind_port
-        self.cluster_name = cluster
+    def __init__(self, kafka_manager, kafka_broker, logger):
+        self.kafka_manager = kafka_manager
+        self.kafka_broker = kafka_broker
 
         global LOGGER
         LOGGER = logger
@@ -22,7 +21,7 @@ class Kafka_Connection(object):
         topic = eval("TOPIC_NAMES.TEST%d" % test_num)
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
         data = {"topic": "%s" % topic, "partitions": "%d" % partitions, "replication": "%d" % replication}
-        uri = "http://%s:%d/clusters/%s/topics/create" % (self.kafka_host, self.km_bind_port, self.cluster_name)
+        uri = "%s/topics/create" % self.kafka_manager
 
         res = requests.post(uri, data=data, headers=headers)
         if res.status_code == 200:
@@ -37,13 +36,15 @@ class Kafka_Connection(object):
         topic = eval("TOPIC_NAMES.TEST%d" % test_num)
         event_count = eval("AVRO_EVENT_COUNT.TEST%d" % test_num)
         if test_num == 1:
-            producer_result = self._run_ssproducer(topic, event_count)
+            producer_result = self._run_producer(topic, event_count, "sb")
+        elif test_num == 2:
+            producer_result = self._run_producer(topic, event_count, "ss")
 
         return producer_result
 
-    def _run_ssproducer(self, topic, event_count):
+    def _run_producer(self, topic, event_count, producer_type):
         is_successfully_produced = False
-        produced_count = ss_producer.produce(self.kafka_host, self.kafka_port, topic, event_count)
+        produced_count = eval("%s_producer.produce(self.kafka_broker, topic, event_count)" % producer_type)
         if produced_count == event_count:
             LOGGER.info("%d events produced to %s", produced_count, topic) 
             is_successfully_produced = True

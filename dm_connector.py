@@ -20,7 +20,7 @@ class DeploymentManager(object):
 
     def download_upload_package(self, test_num):
         pkg_name = eval("PACKAGE_LIST.TEST%d" % test_num)
-        download_command = "wget -O /tmp/%s.tar.gz %s" % (pkg_name, eval("PACKAGE_LINK.TEST%d" % test_num))
+        download_command = "sudo wget -O /tmp/%s.tar.gz %s" % (pkg_name, eval("PACKAGE_LINK.TEST%d" % test_num))
         upload_command = "curl -X PUT %s:%d/packages/%s.tar.gz?user.name=pnda --upload-file /tmp/%s.tar.gz" % (self.dm_host, self.pkgm_port, pkg_name, pkg_name)
         commands = [download_command, upload_command]
         is_download_success = utils.exe_cli(commands)

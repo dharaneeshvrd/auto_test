@@ -41,7 +41,7 @@ def produce(kafka_host_port, topic, event_count):
         writer = avro.io.DatumWriter(schema)
         bytes_writer = io.BytesIO()
         encoder = avro.io.BinaryEncoder(bytes_writer)
-        writer.write({"src": "test-src", "timestamp": current_milli_time(), "host_ip": "0.0.0.0", "rawdata": "a=1;b=2;c=%s;gen_ts=%s"%(seq,current_milli_time())}, encoder)
+        writer.write({"source": "test-src", "timestamp": current_milli_time(), "rawdata": "a=1;b=2;c=%s;gen_ts=%s"%(seq,current_milli_time())}, encoder)
         raw_bytes = bytes_writer.getvalue()
         producer.send(topic, raw_bytes)
         seq += 1

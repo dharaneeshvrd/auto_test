@@ -1,6 +1,8 @@
+import json
 import spur
 import traceback
 import commands
+import requests
 
 # constants
 LOGGER = None
@@ -11,6 +13,7 @@ def set_logger(logger):
 
 def exec_ssh(host, user, key, ssh_commands):
     command_exe_status = True
+    result = None
     shell = spur.SshShell(
         hostname=host,
         username=user,
@@ -20,11 +23,11 @@ def exec_ssh(host, user, key, ssh_commands):
         for ssh_command in ssh_commands:
             LOGGER.info('Host - %s: Command - %s', host, ssh_command)
             try:
-                shell.run(["bash", "-c", ssh_command])
+                result = shell.run(["bash", "-c", ssh_command]).output
             except spur.results.RunProcessError as exception:
                 LOGGER.error(ssh_command +" - error: " + traceback.format_exc(exception))
                 command_exe_status = False
-    return command_exe_status
+    return (command_exe_status, result)
 
 def exe_cli(cli_commands):
     command_exe_status = True
@@ -35,3 +38,7 @@ def exe_cli(cli_commands):
             break
 
     return command_exe_status
+
+def fill_config(edge_ip, dm_port):
+    res = requests.get("http://%s:%d/environment/endpoints" % (edge_ip, dm_port))
+    return json.loads(res.text)
