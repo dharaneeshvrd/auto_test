@@ -21,7 +21,7 @@ def exec_ssh(host, user, key, ssh_commands):
         missing_host_key=spur.ssh.MissingHostKey.accept)
     with shell:
         for ssh_command in ssh_commands:
-            LOGGER.info('Host - %s: Command - %s', host, ssh_command)
+            LOGGER.debug('Host - %s: Command - %s', host, ssh_command)
             try:
                 result = shell.run(["bash", "-c", ssh_command]).output
             except spur.results.RunProcessError as exception:

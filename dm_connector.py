@@ -33,10 +33,8 @@ class DeploymentManager(object):
 
         res = requests.put(uri)
         if res.status_code == 202:
-            LOGGER.info("Deployed %s", pkg_name)
+            LOGGER.debug("Deployed %s", pkg_name)
             is_deploy_success = True
-        else:
-            LOGGER.error("Failed to deploy %s", pkg_name)
 
         return is_deploy_success
 
@@ -53,10 +51,8 @@ class DeploymentManager(object):
 
         res = requests.put(uri, data=json.dumps(payload), headers=headers)
         if res.status_code == 202:
-            LOGGER.info("Created %s", application)
+            LOGGER.debug("Created %s", application)
             is_application_created = True
-        else:
-            LOGGER.error("Failed to create %s", application)
 
         return is_application_created
 
@@ -68,10 +64,8 @@ class DeploymentManager(object):
         
         res = requests.post(uri)
         if res.status_code == 202:
-            LOGGER.info("Started %s", application)
+            LOGGER.debug("Started %s", application)
             is_application_started = True
-        else:
-            LOGGER.error("Failed to start %s", application)
 
         return is_application_started
 

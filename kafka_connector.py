@@ -25,7 +25,7 @@ class Kafka_Connection(object):
 
         res = requests.post(uri, data=data, headers=headers)
         if res.status_code == 200:
-            LOGGER.info("Created new kafka topic %s", topic)
+            LOGGER.debug("Created new kafka topic %s", topic)
             is_created = True
 
         return is_created
@@ -46,8 +46,6 @@ class Kafka_Connection(object):
         is_successfully_produced = False
         produced_count = eval("%s_producer.produce(self.kafka_broker, topic, event_count)" % producer_type)
         if produced_count == event_count:
-            LOGGER.info("%d events produced to %s", produced_count, topic) 
+            LOGGER.debug("%d events produced to %s", produced_count, topic) 
             is_successfully_produced = True
-        else:
-            LOGGER.debug("ssproducer failed to produce events to topic %s", topic)
         return is_successfully_produced
