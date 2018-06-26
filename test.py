@@ -27,9 +27,9 @@ class AutomatedTests(object):
 
     def print_results(self, text, status):
         if status ==True:
-            LOGGER.info("%s: %s", text, "Success")
+            LOGGER.info("%s: %s", text, "PASS")
         else:
-            LOGGER.error("%s: %s", text, "Failure")
+            LOGGER.error("%s: %s", text, "FAIL")
 
     def start_test1(self):
         '''
